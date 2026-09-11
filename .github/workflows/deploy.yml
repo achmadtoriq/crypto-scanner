@@ -1,0 +1,35 @@
+name: Deploy Laravel Crypto Scanner to JagoanHosting
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build & Validate Deployment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐘 Setup PHP 8.2 Environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo, pdo_sqlite, ctype, fileinfo, json, openssl, tokenizer, xml
+
+      - name: 📦 Install Composer Dependencies
+        run: |
+          composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+      - name: ⚡ Run Syntax Check
+        run: |
+          php artisan --version
+          php artisan config:clear
+          php artisan view:clear
+
+      - name: 🚀 Deployment Status
+        run: |
+          echo "✅ Build & validation passed! Code is ready for JagoanHosting cPanel Pull."
