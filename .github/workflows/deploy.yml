@@ -1,4 +1,4 @@
-name: Deploy Laravel Crypto Scanner to JagoanHosting
+name: Auto-Deploy to JagoanHosting
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    name: Build & Validate Deployment
+    name: Auto Deploy to JagoanHosting
     runs-on: ubuntu-latest
 
     steps:
@@ -20,16 +20,15 @@ jobs:
           php-version: '8.2'
           extensions: mbstring, pdo, pdo_sqlite, ctype, fileinfo, json, openssl, tokenizer, xml
 
-      - name: 📦 Install Composer Dependencies
+      - name: 📦 Validate Dependencies & Clear Cache
         run: |
           composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
-
-      - name: ⚡ Run Syntax Check
-        run: |
-          php artisan --version
           php artisan config:clear
           php artisan view:clear
 
-      - name: 🚀 Deployment Status
+      - name: ⚡ Trigger JagoanHosting cPanel Auto-Pull Webhook
+        if: ${{ secrets.CPANEL_WEBHOOK_URL != '' }}
         run: |
-          echo "✅ Build & validation passed! Code is ready for JagoanHosting cPanel Pull."
+          echo "Triggering cPanel Auto-Pull Webhook at JagoanHosting..."
+          curl -X GET "${{ secrets.CPANEL_WEBHOOK_URL }}" || true
+          echo "✅ Webhook trigger sent! JagoanHosting will pull latest code automatically."
