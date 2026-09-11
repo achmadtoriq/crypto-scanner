@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/bprsmadi/public_html/cryptoscan
+    - /bin/cp -R * $DEPLOYPATH
